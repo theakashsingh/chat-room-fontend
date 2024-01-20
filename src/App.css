@@ -1,1 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@300&display=swap');
+
+
+*,::after,::before{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+.app{
+    min-height: 100vh;
+    display: flex;
+    background-image: url("./assets/chat_bg_img.webp");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
