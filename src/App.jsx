@@ -10,7 +10,7 @@ function App() {
       <div className="app">
         <Routes>
           <Route path="/" element={<HomePage />} exact />
-          <Route path="/chat" element={<ChatPage />} />
+          <Route path="/chats" element={<ChatPage />} />
         </Routes>
       </div>
     </ChakraProvider>
