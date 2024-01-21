@@ -8,9 +8,11 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
-import { useState } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+// import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { signupUser } from "../../redux/features/authSlice";
 
 const SignUp = () => {
   const [inputValue, setInputValue] = useState({
@@ -28,7 +30,39 @@ const SignUp = () => {
 
   const toast = useToast();
 
+  const dispatch = useDispatch();
+
+  const user = useSelector(state => state.auth);
+
   let navigate = useNavigate();
+
+  useEffect(() => {
+    if (user.signup) {
+      toast({
+        title: "Registration Successful",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      localStorage.setItem("userInfo", JSON.stringify(user?.user));
+      setLoading(false);
+      navigate("/chats");
+    }
+  }, [user.user]);
+
+  useEffect(() => {
+    if (user.error) {
+      toast({
+        title: "Error Occurred!",
+        description: user.error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  }, [user.error]);
 
   const handleInputValue = e => {
     const { value, name } = e.target;
@@ -50,7 +84,6 @@ const SignUp = () => {
 
     if (pic.type === "image/jpeg" || pic.type === "image/png") {
       const data = new FormData();
-
       data.append("file", pic);
       data.append("upload_preset", "chat-room");
       data.append("cloud_name", "skydevil07");
@@ -116,37 +149,23 @@ const SignUp = () => {
       return;
     }
 
-    try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
+
+    dispatch(
+      signupUser(
+        {
+          name: userName,
+          email: userEmail,
+          password: userPassword,
+          pic: picture,
         },
-      };
-      const { data } = await axios.post(
-        "/api/user",
-        { name:userName, email:userEmail, password:userPassword, pic:picture },
         config
-      );
-      toast({
-        title: "Registration Successful",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setLoading(false);
-      navigate("/chats");
-    } catch (error) {
-      toast({
-        title: "Error Occurred!",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-    }
+      )
+    );
   };
 
   return (

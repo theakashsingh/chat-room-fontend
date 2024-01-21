@@ -8,9 +8,10 @@ import {
   VStack,
   useToast,
 } from "@chakra-ui/react";
-import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { loginUser } from "../../redux/features/authSlice";
 
 const Login = () => {
   const [inputValue, setInputValue] = useState({
@@ -22,7 +23,38 @@ const Login = () => {
   const [isShow, setIsShow] = useState(false);
 
   const toast = useToast();
+  const user = useSelector(state => state.auth);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user.login) {
+      toast({
+        title: "Login Successful",
+        status: "success",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      localStorage.setItem("userInfo", JSON.stringify(user.user));
+      setLoading(false);
+      navigate("/chats");
+    }
+  }, [user.user]);
+
+  useEffect(() => {
+    if (user.error) {
+      toast({
+        title: "error occurred",
+        description: user.error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+      setLoading(false);
+    }
+  }, [user.error]);
 
   const handleInputValue = e => {
     const { value, name } = e.target;
@@ -51,41 +83,13 @@ const Login = () => {
       setLoading(false);
       return;
     }
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
 
-    try {
-      const config = {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      };
-
-      const { data } = axios.post(
-        "/api/user/login",
-        { email: userEmail, password: userPassword },
-        config
-      );
-
-      toast({
-        title: "Login Successful",
-        status: "success",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      setLoading(false);
-      navigate("/chats");
-    } catch (error) {
-      toast({
-        title: "error occurred",
-        description: error.response.data.message,
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-        position: "bottom",
-      });
-      setLoading(false);
-    }
+    dispatch(loginUser({ email: userEmail, password: userPassword }, config));
   };
 
   return (
