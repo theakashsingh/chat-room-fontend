@@ -64,6 +64,12 @@ const authSlice = createSlice({
       (state.loading = false), (state.error = action.payload);
     });
   },
+  reducers: {
+    loginFromLocalStorage: (state, action) => {
+      state.user = action.payload;
+    },
+  },
 });
 
+export const {loginFromLocalStorage} = authSlice.actions
 export default authSlice.reducer;
