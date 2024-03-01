@@ -14,6 +14,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
+  Spinner,
   Text,
   Tooltip,
   useDisclosure,
@@ -23,11 +24,11 @@ import {
 import { useDispatch, useSelector } from "react-redux";
 import ProfileModel from "./ProfileModel";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "../UserAvatar/UserListItem";
-import { getSelectedChat } from "../../redux/features/chatSlice";
+import { getSelectedChat, updateChatAfterSelect } from "../../redux/features/chatSlice";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -35,7 +36,6 @@ const SideDrawer = () => {
   const [loading, setLoading] = useState(false);
   const user = useSelector(state => state.auth.user);
   const selectedChat = useSelector(state => state.chat.selectedChat);
-  console.log(selectedChat);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -64,7 +64,6 @@ const SideDrawer = () => {
         },
       };
       const { data } = await axios.get(`/api/user?search=${search}`, config);
-      console.log({ data });
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -86,17 +85,26 @@ const SideDrawer = () => {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    //  try {
 
-    //   const {data} = await axios.get(`/api/chat`, {userId},config)
-    //  } catch (error) {
-
-    //  }
-
-    console.log("handle access");
     const credentials = { userId, config };
     dispatch(getSelectedChat(credentials));
   };
+  useEffect(() => {
+    if (selectedChat.error) {
+      toast({
+        title: "Error fetching chat",
+        description: selectedChat.error.message,
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom-left",
+      });
+      return;
+    }
+    dispatch(updateChatAfterSelect())
+    onClose();
+  }, [selectedChat]);
+
   return (
     <div>
       <Box
@@ -169,6 +177,7 @@ const SideDrawer = () => {
                 />
               ))
             )}
+            {selectedChat.loading && <Spinner ml={"auto"} display={"flex"} />}
           </DrawerBody>
         </DrawerContent>
       </Drawer>

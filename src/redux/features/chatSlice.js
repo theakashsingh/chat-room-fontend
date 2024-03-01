@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import axios from "axios";
 import chatServices from "../services/chatService";
 
-export const getChat = createAsyncThunk("chat", async () => {
+export const getChat = createAsyncThunk("chat", async (credentials,{rejectWithValue}) => {
   try {
-    const response = await axios.get("/api/chat");
-    return response.data;
+    const {data} = await chatServices.getChat(credentials)
+    return data
   } catch (error) {
     console.log(error);
+    return rejectWithValue(error.response.data)
   }
 });
 
@@ -30,9 +30,11 @@ const initialState = {
     value: null,
     error: null,
   },
-  chat: [],
-  loading: true,
-  error: false,
+  chats:{
+    loading:false,
+    value:[],
+    error:null
+  },
 };
 
 const chatSlice = createSlice({
@@ -40,14 +42,14 @@ const chatSlice = createSlice({
   initialState,
   extraReducers: builder => {
     builder.addCase(getChat.pending, state => {
-      state.loading = true;
+      state.chats.loading = true;
     }),
       builder.addCase(getChat.fulfilled, (state, action) => {
-        state.chat = action.payload;
-        state.loading = false;
+        state.chats.value = action.payload;
+        state.chats.loading = false;
       }),
-      builder.addCase(getChat.rejected, state => {
-        (state.loading = false), (state.error = true);
+      builder.addCase(getChat.rejected, (state,action) => {
+        (state.chats.loading = false), (state.chats.error = action.payload );
       }),
       builder.addCase(getSelectedChat.pending, state => {
         state.selectedChat.loading = true;
@@ -59,6 +61,14 @@ const chatSlice = createSlice({
         (state.selectedChat.loading = false), (state.selectedChat.error = action.payload);
       });
   },
+  reducers:{
+    updateChatAfterSelect:(state)=>{
+        if (state.chats.value.find((curr)=>curr._id === state.selectedChat.value?._id)) {
+          state.chats.value = [state.selectedChat.value, ...state.chats.value]
+        }
+    }
+  }
 });
 
+export const {updateChatAfterSelect} = chatSlice.actions
 export default chatSlice.reducer;
