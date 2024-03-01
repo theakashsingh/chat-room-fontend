@@ -27,6 +27,17 @@ export const getSelectedChat = createAsyncThunk(
   }
 );
 
+export const createGroupChat = createAsyncThunk("createGroupChat",
+async(credentials,{rejectWithValue})=>{
+   try {
+     const {data} = await chatServices.createGroup(credentials)
+     return data
+   } catch (error) {
+     console.log(error)
+     return rejectWithValue(error.response.data)
+   }
+})
+
 const initialState = {
   selectedChat: {
     loading: false,
@@ -38,6 +49,11 @@ const initialState = {
     value: [],
     error: null,
   },
+  groupChat:{
+    loading:false,
+    value:null,
+    error:null
+  }
 };
 
 const chatSlice = createSlice({
@@ -68,14 +84,29 @@ const chatSlice = createSlice({
         (state.selectedChat.loading = false),
           (state.selectedChat.error = action.payload);
       });
+      builder.addCase(createGroupChat.pending,(state)=>{
+          state.groupChat.loading = true
+      }),
+      builder.addCase(createGroupChat.fulfilled,(state,action)=>{
+          state.chats.value = [action.payload, ...state.chats.value],
+          state.groupChat.value = action.payload,
+          state.groupChat.loading = false
+      })
+      builder.addCase(createGroupChat.rejected, (state,action)=>{
+         state.groupChat.loading = false,
+         state.error = action.payload
+      })
   },
   reducers: {
     selectToChat: (state, action) => {
       state.selectedChat.value = action.payload;
     },
+    resetSelectedChat:(state)=>{
+        state.selectedChat.value = null
+    }
   },
 });
 
-export const { updateChatsStateAfterAccessChat, selectToChat } =
+export const { selectToChat, resetSelectedChat } =
   chatSlice.actions;
 export default chatSlice.reducer;

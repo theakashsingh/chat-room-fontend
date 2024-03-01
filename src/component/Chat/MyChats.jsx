@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { AddIcon } from "@chakra-ui/icons";
 import ChatLoading from "../Chat/ChatLoading";
 import { getSender } from "../../Config/ChatLogic";
+import GroupChatModel from "./GroupChatModel";
 
 const MyChats = () => {
   const [loggedUser, setLoggedUser] = useState("");
@@ -40,10 +41,9 @@ const MyChats = () => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     handleGetChat();
   }, []);
-  console.log("Chat",chat.chats.value);
   return (
     <Box
-      display={{ base: chat.selectedChat ? "none" : "flex", md: "flex" }}
+      display={{ base: chat.selectedChat.value ? "none" : "flex", md: "flex" }}
       flexDir={"column"}
       alignItems={"center"}
       p={3}
@@ -63,13 +63,15 @@ const MyChats = () => {
         alignItems={"center"}
       >
         My Chats
-        <Button
-          display={"flex"}
-          fontSize={{ base: "17px", md: "10px", lg: "17px" }}
-          rightIcon={<AddIcon />}
-        >
-          New Group Chat
-        </Button>
+        <GroupChatModel>
+          <Button
+            display={"flex"}
+            fontSize={{ base: "17px", md: "10px", lg: "17px" }}
+            rightIcon={<AddIcon />}
+          >
+            New Group Chat
+          </Button>
+        </GroupChatModel>
       </Box>
       <Box
         display={"flex"}
@@ -85,7 +87,7 @@ const MyChats = () => {
           <Stack overflowY={"scroll"}>
             {chat.chats.value.map(currChat => (
               <Box
-                key={chat._id}
+                key={currChat._id}
                 onClick={() => dispatch(selectToChat(currChat))}
                 cursor={"pointer"}
                 bg={
@@ -105,7 +107,7 @@ const MyChats = () => {
                 <Text>
                   {!currChat.isGroupChat
                     ? getSender(loggedUser, currChat.users)
-                    : chat.chatName}
+                    : currChat.chatName}
                 </Text>
               </Box>
             ))}
