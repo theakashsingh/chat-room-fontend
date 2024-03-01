@@ -1,15 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import chatServices from "../services/chatService";
 
-export const getChat = createAsyncThunk("chat", async (credentials,{rejectWithValue}) => {
-  try {
-    const {data} = await chatServices.getChat(credentials)
-    return data
-  } catch (error) {
-    console.log(error);
-    return rejectWithValue(error.response.data)
+export const getChat = createAsyncThunk(
+  "chat",
+  async (credentials, { rejectWithValue }) => {
+    try {
+      const { data } = await chatServices.getChat(credentials);
+      return data;
+    } catch (error) {
+      console.log(error);
+      return rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 export const getSelectedChat = createAsyncThunk(
   "selectedChat",
@@ -30,10 +33,10 @@ const initialState = {
     value: null,
     error: null,
   },
-  chats:{
-    loading:false,
-    value:[],
-    error:null
+  chats: {
+    loading: false,
+    value: [],
+    error: null,
   },
 };
 
@@ -48,27 +51,31 @@ const chatSlice = createSlice({
         state.chats.value = action.payload;
         state.chats.loading = false;
       }),
-      builder.addCase(getChat.rejected, (state,action) => {
-        (state.chats.loading = false), (state.chats.error = action.payload );
+      builder.addCase(getChat.rejected, (state, action) => {
+        (state.chats.loading = false), (state.chats.error = action.payload);
       }),
       builder.addCase(getSelectedChat.pending, state => {
         state.selectedChat.loading = true;
       }),
       builder.addCase(getSelectedChat.fulfilled, (state, action) => {
-        (state.selectedChat.loading = false), (state.selectedChat.value = action.payload);
+        (state.selectedChat.loading = false),
+          (state.selectedChat.value = action.payload);
+        if (!state.chats.value.find(curr => curr._id === action.payload._id)) {
+          state.chats.value = [action.payload, ...state.chats.value];
+        }
       }),
       builder.addCase(getSelectedChat.rejected, (state, action) => {
-        (state.selectedChat.loading = false), (state.selectedChat.error = action.payload);
+        (state.selectedChat.loading = false),
+          (state.selectedChat.error = action.payload);
       });
   },
-  reducers:{
-    updateChatAfterSelect:(state)=>{
-        if (state.chats.value.find((curr)=>curr._id === state.selectedChat.value?._id)) {
-          state.chats.value = [state.selectedChat.value, ...state.chats.value]
-        }
-    }
-  }
+  reducers: {
+    selectToChat: (state, action) => {
+      state.selectedChat.value = action.payload;
+    },
+  },
 });
 
-export const {updateChatAfterSelect} = chatSlice.actions
+export const { updateChatsStateAfterAccessChat, selectToChat } =
+  chatSlice.actions;
 export default chatSlice.reducer;

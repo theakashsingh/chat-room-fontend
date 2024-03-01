@@ -28,7 +28,7 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "../UserAvatar/UserListItem";
-import { getSelectedChat, updateChatAfterSelect } from "../../redux/features/chatSlice";
+import { getSelectedChat } from "../../redux/features/chatSlice";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -101,7 +101,6 @@ const SideDrawer = () => {
       });
       return;
     }
-    dispatch(updateChatAfterSelect())
     onClose();
   }, [selectedChat]);
 
