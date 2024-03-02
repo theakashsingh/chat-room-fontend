@@ -171,7 +171,7 @@ const GroupChatModel = ({ children }) => {
                   <UserListItem
                     key={currUser._id}
                     user={currUser}
-                    handleAccessChat={() => handleGroup(currUser)}
+                    handleFunction={() => handleGroup(currUser)}
                   />
                 ))
             )}

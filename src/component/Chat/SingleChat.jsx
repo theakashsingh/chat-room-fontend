@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { resetSelectedChat } from "../../redux/features/chatSlice";
 import { getSender, getSenderFull } from "../../Config/ChatLogic";
 import ProfileModel from "./ProfileModel";
+import UpdateGroupChatModal from "./UpdateGroupChatModal";
 const SingleChat = () => {
   const selectedChat = useSelector(state => state.chat.selectedChat);
   const user = useSelector(state => state.auth.user);
@@ -23,7 +24,7 @@ const SingleChat = () => {
             alignItems={"center"}
           >
             <IconButton
-              disabled={{ base: "flex", md: "none" }}
+              display={{ base: "flex", md: "none" }}
               icon={<ArrowBackIcon />}
               onClick={() => dispatch(resetSelectedChat())}
             />
@@ -36,7 +37,10 @@ const SingleChat = () => {
                 />{" "}
               </>
             ) : (
-              <>{selectedChat.value.chatName.toUpperCase()}</>
+              <>
+                {selectedChat.value.chatName.toUpperCase()}{" "}
+                <UpdateGroupChatModal />
+              </>
             )}
           </Text>
           <Box

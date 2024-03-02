@@ -10,7 +10,11 @@ import GroupChatModel from "./GroupChatModel";
 const MyChats = () => {
   const [loggedUser, setLoggedUser] = useState("");
   const user = useSelector(state => state.auth.user);
-  const chat = useSelector(state => state.chat);
+  const chats = useSelector(state => state.chat.chats);
+  const selectedChat = useSelector(state => state.chat.selectedChat);
+  const renameGroup = useSelector(state => state.chat.renameGroup);
+  const addToGroup = useSelector(state => state.chat.addToGroup);
+  const removeFromGroup = useSelector(state => state.chat.removeFromGroup);
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -24,7 +28,7 @@ const MyChats = () => {
   };
 
   useEffect(() => {
-    if (chat.chats.error) {
+    if (chats.error) {
       toast({
         title: "Error Occurred",
         description: "Failed to load chats",
@@ -35,15 +39,15 @@ const MyChats = () => {
       });
       return;
     }
-  }, [chat.chats]);
+  }, [chats]);
 
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     handleGetChat();
-  }, []);
+  }, [renameGroup.value,addToGroup.value,removeFromGroup.value]);
   return (
     <Box
-      display={{ base: chat.selectedChat.value ? "none" : "flex", md: "flex" }}
+      display={{ base: selectedChat.value ? "none" : "flex", md: "flex" }}
       flexDir={"column"}
       alignItems={"center"}
       p={3}
@@ -83,22 +87,20 @@ const MyChats = () => {
         borderRadius={"lg"}
         overflowY={"hidden"}
       >
-        {chat.chats.value ? (
+        {chats.value ? (
           <Stack overflowY={"scroll"}>
-            {chat.chats.value.map(currChat => (
+            {chats.value.map(currChat => (
               <Box
                 key={currChat._id}
                 onClick={() => dispatch(selectToChat(currChat))}
                 cursor={"pointer"}
                 bg={
-                  chat.selectedChat.value?._id === currChat?._id
+                  selectedChat.value?._id === currChat?._id
                     ? "#38B2AC"
                     : "#E8E8E8"
                 }
                 color={
-                  chat.selectedChat.value?._id === currChat?._id
-                    ? "white"
-                    : "black"
+                  selectedChat.value?._id === currChat?._id ? "white" : "black"
                 }
                 px={3}
                 py={2}
