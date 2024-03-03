@@ -26,6 +26,7 @@ import {
 } from "../../redux/features/chatSlice";
 import axios from "axios";
 import UserListItem from "../UserAvatar/UserListItem";
+import { getMessageInChat } from "../../redux/features/messageSlice";
 
 const UpdateGroupChatModal = () => {
   const [groupChatName, setGroupChatName] = useState("");
@@ -59,7 +60,8 @@ const UpdateGroupChatModal = () => {
     }
 
     dispatch(removeUserFromGroup({selectedChat,userToRemove,config}))
-    userToRemove._id === user._id
+    dispatch(getMessageInChat(selectedChat,config))
+    // userToRemove._id === user._id
   };
   const handleAddUser = userToAdd => {
     if (selectedChat.value.users.find(u => u._id === userToAdd._id)) {

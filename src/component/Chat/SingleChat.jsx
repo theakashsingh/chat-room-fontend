@@ -1,14 +1,71 @@
 import { ArrowBackIcon } from "@chakra-ui/icons";
-import { Box, IconButton, Text } from "@chakra-ui/react";
+import {
+  Box,
+  FormControl,
+  IconButton,
+  Input,
+  Spinner,
+  Text,
+  useToast,
+} from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { resetSelectedChat } from "../../redux/features/chatSlice";
 import { getSender, getSenderFull } from "../../Config/ChatLogic";
 import ProfileModel from "./ProfileModel";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
+import { useEffect, useState } from "react";
+import { getMessageInChat, sendMessageInChat } from "../../redux/features/messageSlice";
+import "./styles.css"
+import ScrollableChat from "./ScrollableChat";
+
 const SingleChat = () => {
   const selectedChat = useSelector(state => state.chat.selectedChat);
   const user = useSelector(state => state.auth.user);
+  const newChatMessage = useSelector(state => state.message.newChatMessage);
+  const messages = useSelector(state => state.message.messages);
   const dispatch = useDispatch();
+  const toast = useToast();
+  // const [loading, setLoading] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const sendMessage = async e => {
+    if (e.key === "Enter" && newMessage) {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`,
+        },
+      };
+
+      setNewMessage("");
+      dispatch(sendMessageInChat({ newMessage, selectedChat, config }));
+    }
+  };
+  const typingHandler = e => {
+    setNewMessage(e.target.value);
+  };
+
+  useEffect(() => {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${user.token}`,
+      },
+    };
+    dispatch(getMessageInChat({selectedChat,config}))
+  }, [selectedChat.value]);
+
+  useEffect(() => {
+    if (newChatMessage?.error) {
+      toast({
+        title: "Error Occurred!",
+        description: "Failed to send the message",
+        status: "error",
+        duration: 5000,
+        isClosable: true,
+        position: "bottom",
+      });
+    }
+  }, [newChatMessage?.error]);
+
   return (
     <>
       {selectedChat.value ? (
@@ -53,7 +110,31 @@ const SingleChat = () => {
             h={"100%"}
             borderRadius={"lg"}
             overflowY={"hidden"}
-          ></Box>
+          >
+            {" "}
+            {messages.loading ? (
+              <Spinner
+                size={"xl"}
+                w={20}
+                h={20}
+                alignSelf={"center"}
+                margin={"auto"}
+              />
+            ) : (
+              <div className="messages">
+                <ScrollableChat/>
+              </div>
+            )}
+            <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+              <Input
+                variant={"filled"}
+                bg={"#E0E0E0"}
+                placeholder="Send a message ..."
+                value={newMessage}
+                onChange={typingHandler}
+              />
+            </FormControl>
+          </Box>
         </>
       ) : (
         <Box

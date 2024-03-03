@@ -194,7 +194,7 @@ const chatSlice = createSlice({
         } else {
           state.selectedChat.value = action.payload.data;
         }
-        state.removeFromGroup.loading = true;
+        state.removeFromGroup.loading = false;
         state.removeFromGroup.value = action.payload.data;
       }),
       builder.addCase(removeUserFromGroup.rejected, (state, action) => {

@@ -102,7 +102,7 @@ const SideDrawer = () => {
       return;
     }
     onClose();
-  }, [selectedChat]);
+  }, [selectedChat.error]);
 
   return (
     <div>
