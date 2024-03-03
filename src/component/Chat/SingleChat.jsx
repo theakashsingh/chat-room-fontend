@@ -14,9 +14,17 @@ import { getSender, getSenderFull } from "../../Config/ChatLogic";
 import ProfileModel from "./ProfileModel";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
 import { useEffect, useState } from "react";
-import { getMessageInChat, sendMessageInChat } from "../../redux/features/messageSlice";
-import "./styles.css"
+import {
+  getMessageInChat,
+  getNewMessageReceived,
+  sendMessageInChat,
+} from "../../redux/features/messageSlice";
+import "./styles.css";
 import ScrollableChat from "./ScrollableChat";
+import { io } from "socket.io-client";
+
+const ENDPOINT = "http://localhost:5000";
+let socket, selectedChatCompare;
 
 const SingleChat = () => {
   const selectedChat = useSelector(state => state.chat.selectedChat);
@@ -27,6 +35,7 @@ const SingleChat = () => {
   const toast = useToast();
   // const [loading, setLoading] = useState(false);
   const [newMessage, setNewMessage] = useState("");
+  const [socketConnected, setSocketConnected] = useState(false);
   const sendMessage = async e => {
     if (e.key === "Enter" && newMessage) {
       const config = {
@@ -45,12 +54,20 @@ const SingleChat = () => {
   };
 
   useEffect(() => {
+    socket = io(ENDPOINT);
+    socket.emit("setup", user);
+    socket.on("connection", () => setSocketConnected(true));
+  }, []);
+
+  useEffect(() => {
     const config = {
       headers: {
         Authorization: `Bearer ${user.token}`,
       },
     };
-    dispatch(getMessageInChat({selectedChat,config}))
+    dispatch(getMessageInChat({ selectedChat, config }));
+    // socket.emit("join chat", selectedChat?.value?._id);
+    selectedChatCompare = selectedChat.value;
   }, [selectedChat.value]);
 
   useEffect(() => {
@@ -63,8 +80,22 @@ const SingleChat = () => {
         isClosable: true,
         position: "bottom",
       });
+      return;
     }
   }, [newChatMessage?.error]);
+
+  useEffect(() => {
+    socket.on("message received", newMessageReceived => {
+      if (
+        !selectedChatCompare ||
+        selectedChatCompare._id !== newMessageReceived.chat._id
+      ) {
+        // give notification
+      } else {
+        dispatch(getNewMessageReceived(newMessageReceived));
+      }
+    });
+  }, [newChatMessage.value]);
 
   return (
     <>
@@ -122,7 +153,7 @@ const SingleChat = () => {
               />
             ) : (
               <div className="messages">
-                <ScrollableChat/>
+                <ScrollableChat />
               </div>
             )}
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>

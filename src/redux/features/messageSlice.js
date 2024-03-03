@@ -1,12 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import messageServices from "../services/messageService";
-
+import { io } from "socket.io-client";
+const ENDPOINT = "http://localhost:5000";
 export const sendMessageInChat = createAsyncThunk(
   "message/sendMessage",
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await messageServices.sendMessage(credentials);
-      console.log(response);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -47,6 +47,8 @@ const messageSlice = createSlice({
       state.newChatMessage.loading = true;
     }),
       builder.addCase(sendMessageInChat.fulfilled, (state, action) => {
+        let socket = io(ENDPOINT);
+        socket.emit("new message", action.payload),
         (state.newChatMessage.loading = false),
           (state.newChatMessage.value = action.payload),
           (state.messages.value = [...state.messages.value, action.payload]);
@@ -61,6 +63,8 @@ const messageSlice = createSlice({
       state.messages.loading = true;
     }), 
       builder.addCase(getMessageInChat.fulfilled, (state, action) => {
+        let socket = io(ENDPOINT)
+        socket.emit("join chat", state.selectedChat?.value?._id);
         (state.messages.loading = false),
           (state.messages.value = action.payload)
       });
@@ -69,6 +73,12 @@ const messageSlice = createSlice({
         (state.messages.error = action.payload);
     });
   },
+  reducers:{
+    getNewMessageReceived:(state,action)=>{
+        state.messages.value = [...state.messages.value,action.payload]
+    }
+  }
 });
 
+export const {getNewMessageReceived} = messageSlice.actions
 export default messageSlice.reducer;
