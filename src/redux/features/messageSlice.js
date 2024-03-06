@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import messageServices from "../services/messageService";
 import { io } from "socket.io-client";
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "https://chat-room-bhvk.onrender.com/";
 export const sendMessageInChat = createAsyncThunk(
   "message/sendMessage",
   async (credentials, { rejectWithValue }) => {

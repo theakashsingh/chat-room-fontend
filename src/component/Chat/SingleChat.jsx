@@ -28,7 +28,7 @@ import { io } from "socket.io-client";
 import Lottie from "react-lottie";
 import typing_animation from "../../assets/typing_animation.json";
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = "https://chat-room-bhvk.onrender.com/";
 let socket, selectedChatCompare;
 
 const SingleChat = () => {
