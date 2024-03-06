@@ -34,8 +34,8 @@ import {
   selectToChat,
 } from "../../redux/features/chatSlice";
 import { getSender } from "../../Config/ChatLogic";
-import NotificationBadge from "react-notification-badge/lib/components/NotificationBadge";
-import { Effect } from "react-notification-badge";
+// import NotificationBadge from "react-notification-badge/lib/components/NotificationBadge";
+// import { Effect } from "react-notification-badge";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -136,7 +136,7 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p="1">
-              <NotificationBadge count={notification.length} effect={Effect.SCALE}/>
+              {/* <NotificationBadge count={notification.length} effect={Effect.SCALE}/> */}
               <BellIcon fontSize="2x1" m={1} />
             </MenuButton>
             <MenuList pl={2}>
