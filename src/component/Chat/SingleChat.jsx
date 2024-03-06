@@ -85,7 +85,7 @@ const SingleChat = () => {
   }, [newChatMessage?.error]);
 
   useEffect(() => {
-    socket.on("message received", newMessageReceived => {
+    const receivedMessage = (newMessageReceived)=>{
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.chat._id
@@ -94,8 +94,10 @@ const SingleChat = () => {
       } else {
         dispatch(getNewMessageReceived(newMessageReceived));
       }
-    });
-  }, [newChatMessage.value]);
+    }
+    socket.on("message received", receivedMessage);
+    return ()=> socket.off("message received",receivedMessage)
+  });
 
   return (
     <>
