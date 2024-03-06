@@ -6,7 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       "/api": {
-        target: "https://chat-room-bhvk.onrender.com/",
+        target: "https://chat-room-bhvk.onrender.com",
         secure: false,
       },
     },
