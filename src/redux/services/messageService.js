@@ -1,4 +1,5 @@
 import axios from "axios";
+axios.defaults.baseURL = "https://chit-chat-room-jfok.onrender.com"
 
 const messageServices = {
   sendMessage: async credentials => {
