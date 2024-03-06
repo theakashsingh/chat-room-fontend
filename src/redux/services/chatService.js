@@ -1,20 +1,20 @@
-import axios from "axios";
-axios.defaults.baseURL = "https://chit-chat-room-jfok.onrender.com"
+// import axios from "axios";
+import axiosInstance from "../../Config/axiosInstence";
 
 const chatServices = {
   selectChat: async credentials => {
     const { userId, config } = credentials;
-    const response = await axios.post(`/api/chat`, { userId }, config);
+    const response = await axiosInstance.post(`/api/chat`, { userId }, config);
     console.log(response);
     return response;
   },
   getChat: async credentials => {
-    const response = await axios.get(`/api/chat`, credentials);
+    const response = await axiosInstance.get(`/api/chat`, credentials);
     return response;
   },
   createGroup: async credentials => {
     const { groupChatName, selectedUsers, config } = credentials;
-    const response = await axios.post(
+    const response = await axiosInstance.post(
       "api/chat/group",
       {
         name: groupChatName,
@@ -26,7 +26,7 @@ const chatServices = {
   },
   renameGroup: async credentials => {
     const { groupChatName, selectedChat, config } = credentials;
-    const response = await axios.put(
+    const response = await axiosInstance.put(
       "api/chat/rename",
       { chatId: selectedChat.value._id, chatName: groupChatName },
       config
@@ -35,7 +35,7 @@ const chatServices = {
   },
   addToGroup: async credentials => {
     const { selectedChat, userToAdd, config } = credentials;
-    const response = await axios.put(
+    const response = await axiosInstance.put(
       "api/chat/groupadd",
       { chatId: selectedChat.value._id, userId: userToAdd._id },
       config
@@ -44,7 +44,7 @@ const chatServices = {
   },
   removeFromGroup: async credentials => {
     const { selectedChat, userToRemove, config } = credentials;
-    const response = await axios.put(
+    const response = await axiosInstance.put(
       "api/chat/groupremove",
       { chatId: selectedChat.value._id, userId: userToRemove._id },
       config
