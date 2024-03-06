@@ -28,14 +28,21 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "../UserAvatar/UserListItem";
-import { getSelectedChat } from "../../redux/features/chatSlice";
+import {
+  getSelectedChat,
+  removeNotificationAfterSeen,
+  selectToChat,
+} from "../../redux/features/chatSlice";
+import { getSender } from "../../Config/ChatLogic";
+import NotificationBadge from "react-notification-badge/lib/components/NotificationBadge";
+import { Effect } from "react-notification-badge";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
   const [searchResult, setSearchResult] = useState([]);
   const [loading, setLoading] = useState(false);
   const user = useSelector(state => state.auth.user);
-  const selectedChat = useSelector(state => state.chat.selectedChat);
+  const { selectedChat, notification } = useSelector(state => state.chat);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -129,8 +136,29 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p="1">
+              <NotificationBadge count={notification.length} effect={Effect.SCALE}/>
               <BellIcon fontSize="2x1" m={1} />
             </MenuButton>
+            <MenuList pl={2}>
+              {!notification.length
+                ? "No New Message"
+                : notification.map(currNotifi => (
+                    <MenuItem
+                      key={currNotifi._id}
+                      onClick={() => {
+                        dispatch(selectToChat(currNotifi.chat));
+                        dispatch(removeNotificationAfterSeen(currNotifi));
+                      }}
+                    >
+                      {currNotifi.chat.isGroupChat
+                        ? `New message in ${currNotifi.chat.chatName}`
+                        : `New message from ${getSender(
+                            user,
+                            currNotifi.chat.users
+                          )}`}
+                    </MenuItem>
+                  ))}{" "}
+            </MenuList>
           </Menu>
           <Menu>
             <MenuButton as={Button} rightIcon={<ChevronDownIcon />}>

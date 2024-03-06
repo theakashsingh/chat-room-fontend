@@ -9,7 +9,10 @@ import {
   useToast,
 } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
-import { resetSelectedChat } from "../../redux/features/chatSlice";
+import {
+  resetSelectedChat,
+  setNewNotification,
+} from "../../redux/features/chatSlice";
 import { getSender, getSenderFull } from "../../Config/ChatLogic";
 import ProfileModel from "./ProfileModel";
 import UpdateGroupChatModal from "./UpdateGroupChatModal";
@@ -22,22 +25,39 @@ import {
 import "./styles.css";
 import ScrollableChat from "./ScrollableChat";
 import { io } from "socket.io-client";
+import Lottie from "react-lottie";
+import typing_animation from "../../assets/typing_animation.json";
 
 const ENDPOINT = "http://localhost:5000";
 let socket, selectedChatCompare;
 
 const SingleChat = () => {
-  const selectedChat = useSelector(state => state.chat.selectedChat);
+  const { selectedChat, notification } = useSelector(state => state.chat);
   const user = useSelector(state => state.auth.user);
   const newChatMessage = useSelector(state => state.message.newChatMessage);
   const messages = useSelector(state => state.message.messages);
+
   const dispatch = useDispatch();
   const toast = useToast();
-  // const [loading, setLoading] = useState(false);
+
   const [newMessage, setNewMessage] = useState("");
   const [socketConnected, setSocketConnected] = useState(false);
+  const [typing, setTyping] = useState(false);
+  const [isTyping, setIsTyping] = useState(false);
+
+  const defaultOption = {
+    loop: true,
+    autoplay: true,
+    animationData: typing_animation,
+
+    renderSettings: {
+      preserveAspectRatio: "xMidYMid slice",
+    },
+  };
+
   const sendMessage = async e => {
     if (e.key === "Enter" && newMessage) {
+      socket.emit("stop typing", selectedChat.value._id);
       const config = {
         headers: {
           "Content-Type": "application/json",
@@ -49,24 +69,42 @@ const SingleChat = () => {
       dispatch(sendMessageInChat({ newMessage, selectedChat, config }));
     }
   };
-  const typingHandler = e => {
-    setNewMessage(e.target.value);
-  };
-
   useEffect(() => {
     socket = io(ENDPOINT);
     socket.emit("setup", user);
-    socket.on("connection", () => setSocketConnected(true));
+    socket.on("connected", () => setSocketConnected(true));
+    socket.on("typing", () => setIsTyping(true));
+    socket.on("stop typing", () => setIsTyping(false));
   }, []);
 
+  const typingHandler = e => {
+    setNewMessage(e.target.value);
+
+    if (!socketConnected) return;
+    if (!typing) {
+      setTyping(true);
+      socket.emit("typing", selectedChat.value._id);
+    }
+    let lastTypingTime = new Date().getTime();
+    let timerLength = 3000;
+    setTimeout(() => {
+      let currTime = new Date().getTime();
+      let timeDiff = currTime - lastTypingTime;
+      if (timeDiff >= timerLength && typing) {
+        socket.emit("stop typing", selectedChat.value._id);
+        setTyping(false);
+      }
+    }, timerLength);
+  };
+
+  const config = {
+    headers: {
+      Authorization: `Bearer ${user.token}`,
+    },
+  };
   useEffect(() => {
-    const config = {
-      headers: {
-        Authorization: `Bearer ${user.token}`,
-      },
-    };
     dispatch(getMessageInChat({ selectedChat, config }));
-    // socket.emit("join chat", selectedChat?.value?._id);
+    socket.emit("join chat", selectedChat?.value?._id);
     selectedChatCompare = selectedChat.value;
   }, [selectedChat.value]);
 
@@ -85,20 +123,25 @@ const SingleChat = () => {
   }, [newChatMessage?.error]);
 
   useEffect(() => {
-    const receivedMessage = (newMessageReceived)=>{
+    const receivedMessage = newMessageReceived => {
       if (
         !selectedChatCompare ||
         selectedChatCompare._id !== newMessageReceived.chat._id
       ) {
         // give notification
+        if (!notification.includes(newMessageReceived)) {
+          dispatch(setNewNotification(newMessageReceived));
+          dispatch(getMessageInChat({ selectedChat, config }));
+        }
       } else {
         dispatch(getNewMessageReceived(newMessageReceived));
       }
-    }
+    };
     socket.on("message received", receivedMessage);
-    return ()=> socket.off("message received",receivedMessage)
+    return () => socket.off("message received", receivedMessage);
   });
 
+  console.log({notification});
   return (
     <>
       {selectedChat.value ? (
@@ -159,6 +202,18 @@ const SingleChat = () => {
               </div>
             )}
             <FormControl onKeyDown={sendMessage} isRequired mt={3}>
+              {isTyping ? (
+                <div>
+                  {" "}
+                  <Lottie
+                    options={defaultOption}
+                    width={70}
+                    style={{ marginBottom: 15, marginLeft: 0 }}
+                  />{" "}
+                </div>
+              ) : (
+                <></>
+              )}
               <Input
                 variant={"filled"}
                 bg={"#E0E0E0"}

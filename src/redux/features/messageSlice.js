@@ -63,8 +63,8 @@ const messageSlice = createSlice({
       state.messages.loading = true;
     }), 
       builder.addCase(getMessageInChat.fulfilled, (state, action) => {
-        let socket = io(ENDPOINT)
-        socket.emit("join chat", state.selectedChat?.value?._id);
+        // let socket = io(ENDPOINT)
+        // socket.emit("join chat", state.selectedChat?.value?._id);
         (state.messages.loading = false),
           (state.messages.value = action.payload)
       });

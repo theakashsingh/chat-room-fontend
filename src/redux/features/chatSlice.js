@@ -110,6 +110,7 @@ const initialState = {
     value: null,
     error: false,
   },
+  notification: [],
 };
 
 const chatSlice = createSlice({
@@ -209,8 +210,14 @@ const chatSlice = createSlice({
     resetSelectedChat: state => {
       state.selectedChat.value = null;
     },
+    setNewNotification:(state,action)=>{
+       state.notification = [action.payload,...state.notification]
+    },
+    removeNotificationAfterSeen:(state,action)=>{
+       state.notification = state.notification.filter((n)=>n._id !== action.payload._id)
+    }
   },
 });
 
-export const { selectToChat, resetSelectedChat } = chatSlice.actions;
+export const { selectToChat, resetSelectedChat,setNewNotification,removeNotificationAfterSeen } = chatSlice.actions;
 export default chatSlice.reducer;
