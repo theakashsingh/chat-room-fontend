@@ -24,9 +24,9 @@ import {
   removeUserFromGroup,
   renameGroupChat,
 } from "../../redux/features/chatSlice";
-import axios from "axios";
 import UserListItem from "../UserAvatar/UserListItem";
 import { getMessageInChat } from "../../redux/features/messageSlice";
+import { axiosInstance } from "../../Config/axiosInstance";
 
 const UpdateGroupChatModal = () => {
   const [groupChatName, setGroupChatName] = useState("");
@@ -147,7 +147,7 @@ const UpdateGroupChatModal = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axiosInstance.get(`/api/user?search=${search}`, config);
       console.log(data);
       setLoading(false);
       setSearchResult(data);

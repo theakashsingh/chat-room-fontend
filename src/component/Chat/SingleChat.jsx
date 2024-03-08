@@ -27,8 +27,9 @@ import ScrollableChat from "./ScrollableChat";
 import { io } from "socket.io-client";
 import Lottie from "react-lottie";
 import typing_animation from "../../assets/typing_animation.json";
+import { baseURL } from "../../Config/axiosInstance";
 
-const ENDPOINT = "http://localhost:5000";
+const ENDPOINT = baseURL;
 let socket, selectedChatCompare;
 
 const SingleChat = () => {

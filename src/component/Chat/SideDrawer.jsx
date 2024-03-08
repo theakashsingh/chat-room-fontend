@@ -25,7 +25,6 @@ import { useDispatch, useSelector } from "react-redux";
 import ProfileModel from "./ProfileModel";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import ChatLoading from "./ChatLoading";
 import UserListItem from "../UserAvatar/UserListItem";
 import {
@@ -34,8 +33,8 @@ import {
   selectToChat,
 } from "../../redux/features/chatSlice";
 import { getSender } from "../../Config/ChatLogic";
-// import NotificationBadge from "react-notification-badge/lib/components/NotificationBadge";
-// import { Effect } from "react-notification-badge";
+import { axiosInstance } from "../../Config/axiosInstance";
+
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -70,7 +69,7 @@ const SideDrawer = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axios.get(`/api/user?search=${search}`, config);
+      const { data } = await axiosInstance.get(`/api/user?search=${search}`, config);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -136,7 +135,6 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p="1">
-              {/* <NotificationBadge count={notification.length} effect={Effect.SCALE}/> */}
               <BellIcon fontSize="2x1" m={1} />
             </MenuButton>
             <MenuList pl={2}>
