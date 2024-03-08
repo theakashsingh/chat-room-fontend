@@ -142,7 +142,6 @@ const SingleChat = () => {
     return () => socket.off("message received", receivedMessage);
   });
 
-  console.log({notification});
   return (
     <>
       {selectedChat.value ? (

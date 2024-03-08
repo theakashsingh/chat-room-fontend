@@ -4,7 +4,6 @@ const chatServices = {
   selectChat: async credentials => {
     const { userId, config } = credentials;
     const response = await axiosInstance.post(`/api/chat`, { userId }, config);
-    console.log(response);
     return response;
   },
   getChat: async credentials => {

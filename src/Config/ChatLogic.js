@@ -43,3 +43,17 @@ export const isSameSenderMargin = (messages, m, i, userId) => {
 export const isSameUser = (messages, m, i) => {
   return i > 0 && messages[i - 1].sender._id === m.sender._id;
 };
+
+export const uniqueNotification = arr => {
+  const uniqueSet = new Set();
+  const uniqueArray = [];
+  
+  arr.forEach(item => {
+    const value = item.sender._id;
+    if (!uniqueSet.has(value)) {
+      uniqueSet.add(value);
+      uniqueArray.push(item);
+    }
+  });
+  return uniqueArray;
+};

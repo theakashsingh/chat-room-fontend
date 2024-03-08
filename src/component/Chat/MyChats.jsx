@@ -90,6 +90,7 @@ const MyChats = () => {
         {chats.value ? (
           <Stack overflowY={"scroll"}>
             {chats.value.map(currChat => (
+              
               <Box
                 key={currChat._id}
                 onClick={() => dispatch(selectToChat(currChat))}

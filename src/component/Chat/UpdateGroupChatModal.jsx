@@ -148,7 +148,6 @@ const UpdateGroupChatModal = () => {
         },
       };
       const { data } = await axiosInstance.get(`/api/user?search=${search}`, config);
-      console.log(data);
       setLoading(false);
       setSearchResult(data);
     } catch (error) {

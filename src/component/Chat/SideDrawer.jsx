@@ -1,4 +1,4 @@
-import { BellIcon, ChevronDownIcon, Search2Icon } from "@chakra-ui/icons";
+import { ChevronDownIcon, Search2Icon } from "@chakra-ui/icons";
 import {
   Avatar,
   Box,
@@ -32,9 +32,9 @@ import {
   removeNotificationAfterSeen,
   selectToChat,
 } from "../../redux/features/chatSlice";
-import { getSender } from "../../Config/ChatLogic";
+import { getSender, uniqueNotification } from "../../Config/ChatLogic";
 import { axiosInstance } from "../../Config/axiosInstance";
-
+import NotificationBadge from "../Notification/NotificationBadge";
 
 const SideDrawer = () => {
   const [search, setSearch] = useState("");
@@ -69,7 +69,10 @@ const SideDrawer = () => {
           Authorization: `Bearer ${user.token}`,
         },
       };
-      const { data } = await axiosInstance.get(`/api/user?search=${search}`, config);
+      const { data } = await axiosInstance.get(
+        `/api/user?search=${search}`,
+        config
+      );
       setLoading(false);
       setSearchResult(data);
     } catch (error) {
@@ -135,17 +138,18 @@ const SideDrawer = () => {
         <div>
           <Menu>
             <MenuButton p="1">
-              <BellIcon fontSize="2x1" m={1} />
+              <NotificationBadge count={notification.length} />
             </MenuButton>
             <MenuList pl={2}>
-              {!notification.length
+              {!uniqueNotification(notification).length
                 ? "No New Message"
-                : notification.map(currNotifi => (
+                : uniqueNotification(notification).map(currNotifi => (
                     <MenuItem
                       key={currNotifi._id}
                       onClick={() => {
                         dispatch(selectToChat(currNotifi.chat));
                         dispatch(removeNotificationAfterSeen(currNotifi));
+                        
                       }}
                     >
                       {currNotifi.chat.isGroupChat

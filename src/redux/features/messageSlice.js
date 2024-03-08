@@ -20,7 +20,6 @@ export const getMessageInChat = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await messageServices.getMessages(credentials);
-      console.log(response);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

@@ -6,7 +6,6 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const response = await authService.login(credentials);
-      console.log(response);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);
@@ -20,7 +19,6 @@ export const signupUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const response = await authService.signup(userData);
-      console.log(response);
       return response.data;
     } catch (error) {
       return rejectWithValue(error.response.data);

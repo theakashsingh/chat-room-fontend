@@ -1,0 +1,47 @@
+.notification_badge {
+  position: relative;
+  margin-right: 10px;
+}
+
+.notification_badge::after {
+  position: absolute;
+  top: 6%;
+  right: -3%;
+  content: attr(data);
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background-color: red;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-size: 8px;
+  padding: 2px;
+  border: 1px solid #ffffff;
+}
+
+.badge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 5px 8px;
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.badge.animate {
+  animation: bounce 0.5s infinite alternate;
+}
+
+@keyframes bounce {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}

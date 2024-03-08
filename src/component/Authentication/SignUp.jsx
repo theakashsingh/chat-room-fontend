@@ -97,7 +97,6 @@ const SignUp = () => {
         );
 
         const jsonData = await response.json();
-        console.log(jsonData);
         const img = jsonData.url.toString();
         setPicture(img);
         setLoading(false);

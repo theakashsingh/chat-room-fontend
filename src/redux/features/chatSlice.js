@@ -206,6 +206,7 @@ const chatSlice = createSlice({
   reducers: {
     selectToChat: (state, action) => {
       state.selectedChat.value = action.payload;
+      state.notification = state.notification.filter((n)=>n.chat._id !== action.payload._id)
     },
     resetSelectedChat: state => {
       state.selectedChat.value = null;
@@ -214,7 +215,7 @@ const chatSlice = createSlice({
        state.notification = [action.payload,...state.notification]
     },
     removeNotificationAfterSeen:(state,action)=>{
-       state.notification = state.notification.filter((n)=>n._id !== action.payload._id)
+       state.notification = state.notification.filter((n)=>n.chat._id !== action.payload._id)
     }
   },
 });
