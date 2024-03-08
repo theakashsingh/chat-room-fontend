@@ -1,4 +1,4 @@
-import axiosInstance from "../../Config/axiosInstance";
+import {axiosInstance} from "../../Config/axiosInstance";
 
 const messageServices = {
   sendMessage: async credentials => {

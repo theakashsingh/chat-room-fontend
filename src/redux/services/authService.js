@@ -1,5 +1,4 @@
-import axios from "axios";
-import axiosInstance from "../../Config/axiosInstance";
+import {axiosInstance} from "../../Config/axiosInstance";
 
 const authService = {
   login: async (credentials) => {
@@ -7,7 +6,7 @@ const authService = {
     return response;
   },
   signup: async (userData) => {
-    const response = await axios.post("/api/user", userData);
+    const response = await axiosInstance.post("/api/user", userData);
     return response;
   },
 };

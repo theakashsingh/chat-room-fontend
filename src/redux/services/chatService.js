@@ -1,4 +1,4 @@
-import axiosInstance from "../../Config/axiosInstance";
+import {axiosInstance} from "../../Config/axiosInstance";
 
 const chatServices = {
   selectChat: async credentials => {
