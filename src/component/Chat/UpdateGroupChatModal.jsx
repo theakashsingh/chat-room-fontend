@@ -1,9 +1,8 @@
-import { ViewIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Box,
   Button,
   FormControl,
-  IconButton,
   Input,
   Modal,
   ModalBody,
@@ -163,7 +162,7 @@ const UpdateGroupChatModal = () => {
   };
   return (
     <>
-      <IconButton display={"flex"} icon={<ViewIcon />} onClick={onOpen} />
+      <Avatar size={"sm"} cursor={"pointer"} src={selectedChat.value.groupAdmin.pic} onClick={onOpen} />
 
       <Modal isOpen={isOpen} onClose={onClose} isCentered>
         <ModalOverlay />

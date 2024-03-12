@@ -1,10 +1,10 @@
-import { Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
+import { Avatar, Box, Button, Stack, Text, useToast } from "@chakra-ui/react";
 import { useDispatch, useSelector } from "react-redux";
 import { getChat, selectToChat } from "../../redux/features/chatSlice";
 import { useEffect, useState } from "react";
 import { AddIcon } from "@chakra-ui/icons";
 import ChatLoading from "../Chat/ChatLoading";
-import { getSender } from "../../Config/ChatLogic";
+import { formatTime, getSender, getSenderFull } from "../../Config/ChatLogic";
 import GroupChatModel from "./GroupChatModel";
 
 const MyChats = () => {
@@ -44,7 +44,8 @@ const MyChats = () => {
   useEffect(() => {
     setLoggedUser(JSON.parse(localStorage.getItem("userInfo")));
     handleGetChat();
-  }, [renameGroup.value,addToGroup.value,removeFromGroup.value]);
+  }, [renameGroup.value, addToGroup.value, removeFromGroup.value]);
+
   return (
     <Box
       display={{ base: selectedChat.value ? "none" : "flex", md: "flex" }}
@@ -90,10 +91,11 @@ const MyChats = () => {
         {chats.value ? (
           <Stack overflowY={"scroll"}>
             {chats.value.map(currChat => (
-              
               <Box
                 key={currChat._id}
                 onClick={() => dispatch(selectToChat(currChat))}
+                display={"flex"}
+                alignItems={"center"}
                 cursor={"pointer"}
                 bg={
                   selectedChat.value?._id === currChat?._id
@@ -107,11 +109,52 @@ const MyChats = () => {
                 py={2}
                 borderRadius={"lg"}
               >
-                <Text>
-                  {!currChat.isGroupChat
-                    ? getSender(loggedUser, currChat.users)
-                    : currChat.chatName}
-                </Text>
+                {console.log(currChat)}
+                <Box>
+                  <Avatar
+                    size={"sm"}
+                    src={
+                      !currChat.isGroupChat
+                        ? getSenderFull(loggedUser, currChat.users).pic
+                        : currChat.groupAdmin.pic
+                    }
+                  />
+                </Box>
+                <Box overflow={"hidden"} pl={2} w={"100%"}>
+                  <Box
+                    display={"flex"}
+                    justifyContent={"space-between"}
+                    w={"100%"}
+                  >
+                    <Text>
+                      {!currChat.isGroupChat
+                        ? getSender(loggedUser, currChat.users)
+                        : currChat.chatName}
+                    </Text>
+                    {currChat.latestMessage && (
+                      <Text>
+                        {formatTime(currChat.latestMessage.createdAt)}
+                      </Text>
+                    )}
+                  </Box>
+                  <Box display={"flex"} gap={2}>
+                    {currChat.latestMessage && (
+                      <Text whiteSpace={"nowrap"} fontWeight={"500"}>
+                        {currChat.latestMessage?.sender._id === loggedUser._id
+                          ? "You :"
+                          : `${currChat.latestMessage?.sender.name} :`}
+                      </Text>
+                    )}
+                    <Text
+                      overflow={"hidden"}
+                      whiteSpace={"nowrap"}
+                      textOverflow={"ellipsis"}
+                    >
+                      {currChat.latestMessage &&
+                        currChat.latestMessage?.content}
+                    </Text>
+                  </Box>
+                </Box>
               </Box>
             ))}
           </Stack>

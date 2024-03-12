@@ -1,7 +1,6 @@
-import { ViewIcon } from "@chakra-ui/icons";
 import {
+  Avatar,
   Button,
-  IconButton,
   Image,
   Modal,
   ModalBody,
@@ -22,9 +21,12 @@ const ProfileModel = ({ user, children }) => {
       {children ? (
         <span onClick={onOpen}>{children}</span>
       ) : (
-        <IconButton
+        <Avatar
           disabled={{ base: "flex" }}
-          icon={<ViewIcon />}
+          // icon={<ViewIcon />}
+          size={"sm"}
+          cursor={"pointer"}
+          src={user.pic}
           onClick={onOpen}
         />
       )}

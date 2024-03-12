@@ -47,7 +47,7 @@ export const isSameUser = (messages, m, i) => {
 export const uniqueNotification = arr => {
   const uniqueSet = new Set();
   const uniqueArray = [];
-  
+
   arr.forEach(item => {
     const value = item.sender._id;
     if (!uniqueSet.has(value)) {
@@ -56,4 +56,15 @@ export const uniqueNotification = arr => {
     }
   });
   return uniqueArray;
+};
+
+export const formatTime = timestamp => {
+  const date = new Date(timestamp);
+  let hours = date.getHours();
+  const minutes = (date.getMinutes() < 10 ? "0" : "") + date.getMinutes();
+  const period = hours < 12 ? "am" : "pm";
+
+  hours = hours % 12 || 12;
+
+  return `${hours}:${minutes}${period}`;
 };
